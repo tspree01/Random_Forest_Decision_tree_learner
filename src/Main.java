@@ -15,6 +15,7 @@ class Main
 		trainLabels.loadARFF(fn + "_train_lab.arff");
 
 		// Train the model
+		double column = trainFeatures.row(5)[5];
 		learner.train(trainFeatures, trainLabels);
 
 		// Load the test data
