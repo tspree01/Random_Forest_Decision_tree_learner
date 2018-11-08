@@ -4,10 +4,8 @@ class DecisionTree extends SupervisedLearner
 {
 	Node root;
 	Random rand = new Random();
-	//Matrix decisionFeature = new Matrix();
+	Matrix decisionFeature = new Matrix();
 
-	// need to return a int and a double so return a interiorNode
-	// there is a better way to do this
 	DividingColumnAndPivot pick_dividing_column_and_pivot(Matrix feature)
 	{
 		DividingColumnAndPivot columnAndPivot = new DividingColumnAndPivot();
@@ -20,11 +18,10 @@ class DecisionTree extends SupervisedLearner
 		return columnAndPivot;
 	}
 
-
 	@Override
 	String name()
 	{
-		return null;
+		return "Decision Tree";
 	}
 
 	Node build_tree(Matrix feature, Matrix labels)
@@ -107,17 +104,18 @@ class DecisionTree extends SupervisedLearner
 	void train(Matrix features, Matrix labels)
 	{
 		root = build_tree(features, labels);
-		//decisionFeature = new Matrix(features);
+		decisionFeature = new Matrix(features);
 	}
 
 	@Override
 	void predict(double[] in, double[] out)
 	{
 		Node n = root;
-		while (true)
+		while (!n.isLeaf())
 		{
 			if (n.isInterior())
 			{
+				int vals = decisionFeature.valueCount()
 				if (in[((InteriorNode)n).attribute] < ((InteriorNode)n).pivot)
 				{
 					n = ((InteriorNode)n).a;
@@ -130,7 +128,6 @@ class DecisionTree extends SupervisedLearner
 			else
 			{
 				 out = ((LeafNode)n).label;
-
 			}
 		}
 	}
