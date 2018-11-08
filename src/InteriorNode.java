@@ -5,5 +5,19 @@ class InteriorNode extends Node
 	Node a;
 	Node b;
 
+	InteriorNode(Node a, Node b, int attribute, double pivot)
+	{
+		this.attribute = attribute;
+		this.pivot = pivot;
+		this.a = a;
+		this.b = b;
+	}
+
+	@Override
+	boolean isInterior()
+	{
+		return true;
+	}
+
 	boolean isLeaf() { return false; }
 }
