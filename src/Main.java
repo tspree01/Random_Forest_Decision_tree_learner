@@ -39,6 +39,11 @@ class Main
 	public static void main(String[] args)
 	{
 		testLearner(new BaselineLearner());
-		//testLearner(new RandomForest(50));
+		for (int i = 0; i < 10; i++)
+		{
+			testLearner(new DecisionTree());
+			System.out.println();
+		}
+		testLearner(new RandomForest(50));
 	}
 }

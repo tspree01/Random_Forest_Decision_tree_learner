@@ -26,24 +26,38 @@ class DecisionTree extends SupervisedLearner
 
 	Node build_tree(Matrix feature, Matrix labels)
 	{
-		if (feature.rows() != labels.rows())
-		{
-			throw new RuntimeException("mismatching features and labels");
-		}
-
-		int col = pick_dividing_column_and_pivot(feature).column;
-		double pivot = pick_dividing_column_and_pivot(feature).pivot;
 		Matrix feat_a = new Matrix();
 		Matrix feat_b = new Matrix();
 		Matrix lab_a = new Matrix();
 		Matrix lab_b = new Matrix();
 
+		if (feature.rows() != labels.rows())
+		{
+			throw new RuntimeException("mismatching features and labels");
+		}
+
+		int col = 0;
+		double pivot = 0;
+		int featureRows = 0;
+
 		for (int patience = 12; patience > 0; patience--)
 		{
+			DividingColumnAndPivot dcp = pick_dividing_column_and_pivot(feature);
+			col = dcp.column;
+			pivot = dcp.pivot;
+
+			//Make a copy of the feature and labels to use to see if you get a good split
+			Matrix copyFeature = new Matrix(feature);
+			Matrix copyLabels = new Matrix(labels);
+
 			//checks to see if its a continous or categorical value
 			int vals = feature.valueCount(col);
 
 			//copy meta data out of the feature matrix and label matrix
+			feat_a = new Matrix();
+			feat_b = new Matrix();
+			lab_a = new Matrix();
+			lab_b = new Matrix();
 			feat_a.copyMetaData(feature);
 			feat_b.copyMetaData(feature);
 			lab_a.copyMetaData(labels);
@@ -55,37 +69,38 @@ class DecisionTree extends SupervisedLearner
 				if (vals == 0)
 				{
 					//continuous
-					if (feature.row(i)[col] < pivot)
+					if (copyFeature.row(0)[col] < pivot)
 					{
-						feat_a.takeRow(feat_a.removeRow(i));
-						lab_a.takeRow(lab_a.removeRow(i));
+						feat_a.takeRow(copyFeature.removeRow(0));
+						lab_a.takeRow(copyLabels.removeRow(0));
 					}
 					else
 					{
-						feat_b.takeRow(feat_a.removeRow(i));
-						lab_b.takeRow(lab_b.removeRow(i));
+						feat_b.takeRow(copyFeature.removeRow(0));
+						lab_b.takeRow(copyLabels.removeRow(0));
 					}
 				}
 				else
 				{
 					//Divide on
 					//categorical
-					if (feature.row(i)[col] == pivot)
+					if (feature.row(0)[col] == pivot)
 					{
-						feat_a.takeRow(feat_a.removeRow(i));
-						lab_a.takeRow(lab_a.removeRow(i));
+						feat_a.takeRow(copyFeature.removeRow(0));
+						lab_a.takeRow(copyLabels.removeRow(0));
 					}
 					else
 					{
-						feat_b.takeRow(feat_a.removeRow(i));
-						lab_b.takeRow(lab_b.removeRow(i));
+						feat_b.takeRow(copyFeature.removeRow(0));
+						lab_b.takeRow(copyLabels.removeRow(0));
 					}
 				}
 			}
-			if (feat_a.rows() != 0 || feat_b.rows() != 0)
+			if (feat_a.rows() != 0 && feat_b.rows() != 0)
 			{
 				break;
 			}
+
 		}
 		//failed to divide the data then return a leaf node
 		if (feat_a.rows() == 0 || feat_b.rows() == 0)
@@ -115,20 +130,30 @@ class DecisionTree extends SupervisedLearner
 		{
 			if (n.isInterior())
 			{
-				int vals = decisionFeature.valueCount()
-				if (in[((InteriorNode)n).attribute] < ((InteriorNode)n).pivot)
+				int vals = decisionFeature.valueCount(((InteriorNode)n).attribute);
+				if (vals == 0)
 				{
-					n = ((InteriorNode)n).a;
+					if (in[((InteriorNode) n).attribute] < ((InteriorNode) n).pivot)
+					{
+						n = ((InteriorNode) n).a;
+					}
+					else
+					{
+						n = ((InteriorNode) n).b;
+					}
 				}
-				else
-				{
-					n = ((InteriorNode)n).b;
+				else{
+					if (in[((InteriorNode) n).attribute] == ((InteriorNode) n).pivot)
+					{
+						n = ((InteriorNode) n).a;
+					}
+					else
+					{
+						n = ((InteriorNode) n).b;
+					}
 				}
-			}
-			else
-			{
-				 out = ((LeafNode)n).label;
 			}
 		}
+		Vec.copy(out,((LeafNode)n).label);
 	}
 }
