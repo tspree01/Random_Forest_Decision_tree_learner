@@ -8,6 +8,24 @@ class Main
 	static void test(SupervisedLearner learner, String challenge)
 	{
 		// Load the training data
+		//String fn = "data/" + challenge;
+/*		String fn = "data/";
+		Matrix trainFeatures = new Matrix();
+		trainFeatures.loadARFF(fn + "debug_train_feat.arff");
+		Matrix trainLabels = new Matrix();
+		trainLabels.loadARFF(fn + "debug_train_lab.arff");
+
+		// Train the model
+		//double column = trainFeatures.row(5)[5];
+		learner.train(trainFeatures, trainLabels);
+
+		// Load the test data
+		Matrix testFeatures = new Matrix();
+		testFeatures.loadARFF(fn + "debug_train_feat.arff");
+		Matrix testLabels = new Matrix();
+		testLabels.loadARFF(fn + "debug_train_lab.arff");*/
+
+
 		String fn = "data/" + challenge;
 		Matrix trainFeatures = new Matrix();
 		trainFeatures.loadARFF(fn + "_train_feat.arff");
@@ -15,7 +33,7 @@ class Main
 		trainLabels.loadARFF(fn + "_train_lab.arff");
 
 		// Train the model
-		double column = trainFeatures.row(5)[5];
+		//double column = trainFeatures.row(5)[5];
 		learner.train(trainFeatures, trainLabels);
 
 		// Load the test data
@@ -24,9 +42,11 @@ class Main
 		Matrix testLabels = new Matrix();
 		testLabels.loadARFF(fn + "_test_lab.arff");
 
+
 		// Measure and report accuracy
 		int misclassifications = learner.countMisclassifications(testFeatures, testLabels);
 		System.out.println("Misclassifications by " + learner.name() + " at " + challenge + " = " + Integer.toString(misclassifications) + "/" + Integer.toString(testFeatures.rows()));
+
 	}
 
 	public static void testLearner(SupervisedLearner learner)
@@ -39,11 +59,7 @@ class Main
 	public static void main(String[] args)
 	{
 		testLearner(new BaselineLearner());
-		for (int i = 0; i < 10; i++)
-		{
-			testLearner(new DecisionTree());
-			System.out.println();
-		}
-		testLearner(new RandomForest(50));
+		testLearner(new DecisionTree());
+		testLearner(new RandomForest(30));
 	}
 }

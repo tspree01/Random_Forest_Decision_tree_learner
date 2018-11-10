@@ -4,7 +4,9 @@ import java.util.Random;
 class RandomForest extends SupervisedLearner
 {
 	DecisionTree[] trees;
-	Random rand = new Random();
+	static Random rand = new Random();
+	Matrix decisionLabels = new Matrix();
+	Matrix decisionFeatures = new Matrix();
 
 	RandomForest(int numberOfTrees){
 		trees = new DecisionTree[numberOfTrees];
@@ -19,11 +21,10 @@ class RandomForest extends SupervisedLearner
 	@Override
 	void train(Matrix features, Matrix labels)
 	{
-		Matrix baggedFeatures = new Matrix();
-		Matrix baggedLabels = new Matrix();
-
-		baggedFeatures.copyMetaData(features);
-		baggedLabels.copyMetaData(labels);
+		Matrix baggedFeatures;
+		Matrix baggedLabels;
+		decisionLabels = new Matrix(labels);
+		decisionFeatures = new Matrix(features);
 
 		for (int i = 0; i < trees.length; i++)
 		{
@@ -48,5 +49,19 @@ class RandomForest extends SupervisedLearner
 	void predict(double[] in, double[] out)
 	{
 
+		Matrix aggregation = new Matrix();
+		aggregation.copyMetaData(decisionLabels);
+		for (DecisionTree tree : trees)
+		{
+			double[] temp = new double[out.length];
+			tree.predict(in, temp);
+			aggregation.takeRow(temp);
+
+		}
+		for (int i = 0; i < aggregation.cols(); i++)
+		{
+			out[i] = aggregation.mostCommonValue(i);
+		}
 	}
+
 }

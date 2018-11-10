@@ -3,7 +3,7 @@ import java.util.Random;
 class DecisionTree extends SupervisedLearner
 {
 	Node root;
-	Random rand = new Random();
+	static Random rand = new Random();
 	Matrix decisionFeature = new Matrix();
 
 	DividingColumnAndPivot pick_dividing_column_and_pivot(Matrix feature)
@@ -26,10 +26,11 @@ class DecisionTree extends SupervisedLearner
 
 	Node build_tree(Matrix feature, Matrix labels)
 	{
-		Matrix feat_a = new Matrix();
-		Matrix feat_b = new Matrix();
-		Matrix lab_a = new Matrix();
-		Matrix lab_b = new Matrix();
+		Matrix feat_a = null;
+		Matrix feat_b = null;
+		Matrix lab_a = null;
+		Matrix lab_b = null;
+
 
 		if (feature.rows() != labels.rows())
 		{
@@ -84,7 +85,7 @@ class DecisionTree extends SupervisedLearner
 				{
 					//Divide on
 					//categorical
-					if (feature.row(0)[col] == pivot)
+					if (copyFeature.row(0)[col] == pivot)
 					{
 						feat_a.takeRow(copyFeature.removeRow(0));
 						lab_a.takeRow(copyLabels.removeRow(0));
@@ -126,11 +127,11 @@ class DecisionTree extends SupervisedLearner
 	void predict(double[] in, double[] out)
 	{
 		Node n = root;
-		while (!n.isLeaf())
+		while (! n.isLeaf())
 		{
 			if (n.isInterior())
 			{
-				int vals = decisionFeature.valueCount(((InteriorNode)n).attribute);
+				int vals = decisionFeature.valueCount(((InteriorNode) n).attribute);
 				if (vals == 0)
 				{
 					if (in[((InteriorNode) n).attribute] < ((InteriorNode) n).pivot)
@@ -142,7 +143,8 @@ class DecisionTree extends SupervisedLearner
 						n = ((InteriorNode) n).b;
 					}
 				}
-				else{
+				else
+				{
 					if (in[((InteriorNode) n).attribute] == ((InteriorNode) n).pivot)
 					{
 						n = ((InteriorNode) n).a;
@@ -154,6 +156,6 @@ class DecisionTree extends SupervisedLearner
 				}
 			}
 		}
-		Vec.copy(out,((LeafNode)n).label);
+		Vec.copy(out, ((LeafNode) n).label);
 	}
 }
