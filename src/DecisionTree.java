@@ -3,7 +3,7 @@ import java.util.Random;
 class DecisionTree extends SupervisedLearner
 {
 	Node root;
-	static Random rand = new Random();
+	static Random rand = new Random(3);
 	Matrix decisionFeature = new Matrix();
 
 	DividingColumnAndPivot pick_dividing_column_and_pivot(Matrix feature)
